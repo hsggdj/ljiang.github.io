@@ -55,7 +55,7 @@ params:
     profileMode:
           enabled: true
           title: Leyi (Lucy) Jiang
-          subtitle: "I am a PhD candidate at the <a href="https://www.mpi-cbg.de/research/our-research/research-areas/mathematics-and-artificial-intelligence"> Centre of Mathematics and Artificial Intelligence </a> of the Max Planck Institute of Molecular Cell Biology and Genetics in Dresden, Germany, within the <a href="https://www.mpi-cbg.de/research/researchgroups/currentgroups/heather-harrington/research"> Algebraic Systems Biology </a> group of Heather A. Harrington. My research focuses on developing and applying Topological Data Analysis to uncover the hidden structures within spatial sib-cellular biological data."
+          subtitle: "I am a PhD candidate at the Centre of Mathematics and Artificial Intelligence of the Max Planck Institute of Molecular Cell Biology and Genetics in Dresden, Germany, within the <a href="https://www.mpi-cbg.de/research/researchgroups/currentgroups/heather-harrington/research"> Algebraic Systems Biology </a> group of Heather A. Harrington. My research focuses on developing and applying Topological Data Analysis to uncover the hidden structures within spatial sib-cellular biological data."
           imageUrl: "picture.jpeg"
           imageWidth: 160
           imageHeight: 160
