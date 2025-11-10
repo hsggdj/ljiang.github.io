@@ -12,21 +12,21 @@ taxonomies:
 
 menu:
     main:
-        - name: Books
-          url: books/
-          weight: 5 
+        #- name: Books
+        #  url: books/
+        #  weight: 5 
         - name: Papers
           url: papers/
+          weight: 1
+        - name: Activities
+          url: activities/
           weight: 2
-        - name: Courses
-          url: courses/
-          weight: 3
-        - name: Data
-          url: data/
-          weight: 4 
-        - name: Blog
-          url: https://en.wikipedia.org/wiki/Moritz-Maria_von_Igelfeld_(character)
-          weight: 6
+        #- name: Data
+        #  url: data/
+        #  weight: 4 
+        #- name: Blog
+        #  url: https://en.wikipedia.org/wiki/Moritz-Maria_von_Igelfeld_(character)
+        #  weight: 6
 
 params:
     description: "This website hosts Leyi Jiang's research papers, course materials, data, curriculum vitae, and contact information."
@@ -43,8 +43,8 @@ params:
     ShowPostNavLinks: false
     ShowBreadCrumbs: false
     ShowCodeCopyButtons: true
-    ShowAllPagesInArchive: false
-    MainSections: ["books","courses","papers","data"]
+    #ShowAllPagesInArchive: false
+    #MainSections: ["books","courses","papers","data"]
     ShowToc: false
     disableScrollToTop: true
     TocOpen: true
@@ -54,7 +54,7 @@ params:
     math: true
     profileMode:
           enabled: true
-          title: Leyi (Lucy) Jiang
+          title: Leyi Jiang
           subtitle: "I am a PhD candidate at the Centre of Mathematics and Artificial Intelligence of the Max Planck Institute of Molecular Cell Biology and Genetics in Dresden, Germany, within the Algebraic Systems Biology group of Heather A. Harrington. My research focuses on developing and applying Topological Data Analysis to uncover the hidden structures within spatial sib-cellular biological data."
           imageUrl: "picture.jpeg"
           imageWidth: 160
@@ -62,26 +62,26 @@ params:
           buttons:
             - name: Papers
               url: papers/
-            - name: Data
-              url: data/
-            - name: Books
-              url: books/
-            - name: Courses
-              url: courses/
-            - name: Tags
-              url: tags/
-            - name: Archive
-              url: archive/
-            - name: Blog
-              url: https://en.wikipedia.org/wiki/Moritz-Maria_von_Igelfeld_(character)
+            #- name: Data
+            #  url: data/
+            #- name: Books
+            #  url: books/
+            #- name: Courses
+            #  url: courses/
+            #- name: Tags
+            #  url: tags/
+            #- name: Archive
+            #  url: archive/
+            - name: Reading group
+              url: https://angeloelsaliby.github.io/AppliedToricGeometry-ReadingGroup/
 
     socialIcons:
-        - name: CV
-          url: cv.pdf
+        #- name: CV
+        #  url: cv.pdf
         - name: Email
           url: mailto:ljiang@mpi-cbg.de
         - name: Location
-          url: https://www.google.com/maps/place//data=!4m2!3m1!1s0x4709c8c9cc5e9c37:0xbd778c895affd9cd?sa=X&ved=1t:8290&ictx=111
+          url: location/
         #- name: Google Scholar
         #  url: https://scholar.google.com/citations?user=cL23w-4AAAAJ
         #- name: GitHub
@@ -90,10 +90,13 @@ params:
         #  url: https://pmichaillat.substack.com
         #- name: YouTube
         #  url: https://www.youtube.com/@pmichaillat
-        #- name: Twitter
-        #  url: https://x.com/pmichaillat
         #- name: Bluesky
         #  url: https://bsky.app/profile/pmichaillat.bsky.social
+        #- name: LinkedIn
+        #  url: https://linkedin.com/in/rosavandenende
+        #- name: ORCID
+        #  url: https://orcid.org/0000-0002-9417-1075
+
 
     assets:
         disableScrollBarStyle: true
