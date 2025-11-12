@@ -84,21 +84,20 @@ params:
           url: mailto:ljiang@mpi-cbg.de
         - name: Location
           url: location/
+        #- name: ORCID
+        #  url: https://orcid.org/0009-0002-0756-5760
         #- name: Google Scholar
-        #  url: https://scholar.google.com/citations?user=cL23w-4AAAAJ
+        #  url: https://scholar.google.com/citations?user=fy8jT8AAAAAJ
         #- name: GitHub
-        #  url: https://github.com/pmichaillat
+        #  url: https://github.com/leyijiang17
+        #- name: LinkedIn
+        #  url: https://uk.linkedin.com/in/leyi-jiang-943125227
         #- name: Substack
         #  url: https://pmichaillat.substack.com
         #- name: YouTube
         #  url: https://www.youtube.com/@pmichaillat
         #- name: Bluesky
         #  url: https://bsky.app/profile/pmichaillat.bsky.social
-        #- name: LinkedIn
-        #  url: https://linkedin.com/in/rosavandenende
-        #- name: ORCID
-        #  url: https://orcid.org/0000-0002-9417-1075
-
 
     assets:
         disableScrollBarStyle: true
