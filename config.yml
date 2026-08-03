@@ -21,9 +21,12 @@ menu:
         - name: Activities
           url: activities/
           weight: 2
+        - name: Projects
+          url: projects/
+          weight: 3
         - name: Choreography & Dance
           url: dance/
-          weight: 3
+          weight: 4
         #- name: Data
         #  url: data/
         #  weight: 4 
@@ -70,6 +73,8 @@ params:
               url: papers/
             - name: Activities
               url: activities/
+            - name: Projects
+              url: projects/
             #- name: Choreography & Dance
             #  url: dance/
             #- name: Data

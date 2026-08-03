@@ -1,0 +1,973 @@
+<section class="fractal-game" data-fractal-game>
+  <style>
+    .fractal-game {
+      --bg: #05070d;
+      --panel: rgba(8, 14, 25, 0.86);
+      --panel-border: rgba(125, 249, 255, 0.16);
+      --text: #d9e7f1;
+      --muted: #8fa3b8;
+      --cyan: #7df9ff;
+      --orange: #ffb347;
+      --green: #44ff88;
+      --amber: #ffaa00;
+      --red: #ff6666;
+      position: relative;
+      overflow: hidden;
+      width: 100vw;
+      max-width: 100vw;
+      margin: 2.25rem 0 2.25rem calc(50% - 50vw);
+      padding: 1.5rem;
+      border: 1px solid var(--panel-border);
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at top left, rgba(125, 249, 255, 0.12), transparent 30%),
+        radial-gradient(circle at 85% 15%, rgba(255, 179, 71, 0.12), transparent 28%),
+        linear-gradient(180deg, #05070d 0%, #0a1020 100%);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      animation: fractal-game-fade-in 700ms ease-out both;
+    }
+
+    .fractal-game::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 85%);
+      pointer-events: none;
+    }
+
+    .fractal-game * {
+      box-sizing: border-box;
+    }
+
+    .fractal-game__shell {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 1.1rem;
+    }
+
+    .fractal-game__unsupported {
+      display: none;
+      position: relative;
+      z-index: 2;
+      margin: 0 auto;
+      max-width: 780px;
+      min-height: 360px;
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(8, 14, 25, 0.88);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #d9e7f1;
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+
+    .fractal-game__hero {
+      display: grid;
+      gap: 0.6rem;
+      align-items: start;
+    }
+
+    .fractal-game__eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: fit-content;
+      padding: 0.35rem 0.7rem;
+      border: 1px solid rgba(125, 249, 255, 0.18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--cyan);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .fractal-game__title {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 3.4vw, 3.2rem);
+      line-height: 1.02;
+      color: #f5fbff;
+      text-wrap: balance;
+    }
+
+    .fractal-game__subtitle {
+      max-width: 64ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.6;
+    }
+
+    .fractal-game__references {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem 0.85rem;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .fractal-game__references strong {
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    .fractal-game__status-card,
+    .fractal-game__panel,
+    .fractal-game__controls {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .fractal-game__status-card {
+      display: grid;
+      gap: 0.9rem;
+      padding: 1rem 1rem 1.1rem;
+      border-radius: 22px;
+    }
+
+    .fractal-game__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .fractal-game__level {
+      display: grid;
+      gap: 0.15rem;
+    }
+
+    .fractal-game__level-label {
+      color: var(--cyan);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .fractal-game__level-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #f7fbff;
+    }
+
+    .fractal-game__level-difficulty {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .fractal-game__score-stack {
+      display: grid;
+      gap: 0.35rem;
+      min-width: min(100%, 320px);
+      flex: 1;
+    }
+
+    .fractal-game__score-topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      align-items: baseline;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .fractal-game__score-value {
+      color: var(--cyan);
+      font-weight: 700;
+      font-size: 1.05rem;
+      white-space: nowrap;
+    }
+
+    .fractal-game__bar {
+      position: relative;
+      height: 13px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .fractal-game__bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #ff4d4d 0%, #ffaa00 45%, #44ff88 100%);
+      box-shadow: 0 0 18px rgba(125, 249, 255, 0.18);
+      transition: width 180ms linear;
+    }
+
+    .fractal-game__score-note {
+      min-height: 1.2rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .fractal-game__controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 0.95rem;
+      border-radius: 20px;
+    }
+
+    .fractal-game__button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+    }
+
+    .fractal-game__button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 0.72rem 1rem;
+      color: #051019;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+    }
+
+    .fractal-game__button:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .fractal-game__button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+      box-shadow: none;
+    }
+
+    .fractal-game__button--hint {
+      background: linear-gradient(135deg, #ffd27a, #ffb347);
+    }
+
+    .fractal-game__button--reset {
+      background: linear-gradient(135deg, #8be9ff, #7df9ff);
+    }
+
+    .fractal-game__button--next {
+      background: linear-gradient(135deg, #62ff9c, #44ff88);
+    }
+
+    .fractal-game__hint {
+      min-height: 1.4rem;
+      color: #c0c9ff;
+      font-size: 0.94rem;
+      line-height: 1.5;
+    }
+
+    .fractal-game__grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr);
+      gap: 0.9rem;
+    }
+
+    .fractal-game__panel {
+      display: grid;
+      gap: 0.7rem;
+      padding: 0.85rem;
+      border-radius: 20px;
+      min-width: 0;
+    }
+
+    .fractal-game__panel h3 {
+      margin: 0;
+      color: #f4f7ff;
+      font-size: 0.98rem;
+      letter-spacing: 0.01em;
+    }
+
+    .fractal-game__panel p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .fractal-game__canvas-wrap {
+      position: relative;
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #02030a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      aspect-ratio: 1 / 1;
+    }
+
+    .fractal-game__canvas-wrap--wide {
+      aspect-ratio: 4 / 3;
+    }
+
+    .fractal-game canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      image-rendering: auto;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    .fractal-game__marker {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 14px;
+      height: 14px;
+      margin: -7px 0 0 -7px;
+      border: 2px solid rgba(255, 179, 71, 0.95);
+      border-radius: 50%;
+      box-shadow: 0 0 0 6px rgba(255, 179, 71, 0.12);
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(0.75);
+      transition: opacity 150ms ease, transform 150ms ease;
+    }
+
+    .fractal-game__marker--current {
+      width: 16px;
+      height: 16px;
+      margin: -8px 0 0 -8px;
+      border: 2px solid rgba(125, 249, 255, 1);
+      box-shadow: 0 0 0 6px rgba(125, 249, 255, 0.16);
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .fractal-game__marker--current::before,
+    .fractal-game__marker--current::after {
+      background: rgba(125, 249, 255, 1);
+    }
+
+    .fractal-game__marker--target {
+      border-color: rgba(255, 179, 71, 0.95);
+      box-shadow: 0 0 0 6px rgba(255, 179, 71, 0.12);
+    }
+
+    .fractal-game__marker.is-visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .fractal-game__marker::before,
+    .fractal-game__marker::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      background: rgba(255, 179, 71, 0.95);
+      transform: translate(-50%, -50%);
+    }
+
+    .fractal-game__marker::before {
+      width: 18px;
+      height: 2px;
+    }
+
+    .fractal-game__marker::after {
+      width: 2px;
+      height: 18px;
+    }
+
+    .fractal-game__caption {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .fractal-game__caption strong {
+      color: var(--orange);
+      font-weight: 700;
+    }
+
+    .fractal-game__complete {
+      min-height: 1.4rem;
+      color: var(--cyan);
+      font-size: 0.94rem;
+      font-weight: 700;
+    }
+
+    @keyframes fractal-game-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .fractal-game {
+        border-radius: 0;
+        margin: 1.25rem 0;
+      }
+
+      .fractal-game__shell {
+        display: none;
+      }
+
+      .fractal-game__unsupported {
+        display: flex;
+      }
+    }
+
+    .fractal-game.is-mobile .fractal-game__shell {
+      display: none;
+    }
+
+    .fractal-game.is-mobile .fractal-game__unsupported {
+      display: flex;
+    }
+  </style>
+
+  <div class="fractal-game__unsupported" data-mobile-warning>
+    This interactive Fractal Pattern Hunter is currently supported on laptops only. Please open this page on a larger screen.
+  </div>
+
+  <div class="fractal-game__shell">
+    <div class="fractal-game__hero">
+      <div class="fractal-game__eyebrow">Interactive mathematics</div>
+      <h2 class="fractal-game__title">Fractal Pattern Hunter</h2>
+    </div>
+
+    <div class="fractal-game__status-card">
+      <div class="fractal-game__meta">
+        <div class="fractal-game__level">
+          <div class="fractal-game__level-label">Level</div>
+          <div class="fractal-game__level-name" data-level-name>Loading…</div>
+          <div class="fractal-game__level-difficulty" data-level-difficulty></div>
+        </div>
+
+        <div class="fractal-game__score-stack" aria-live="polite">
+          <div class="fractal-game__score-topline">
+            <span>Match score</span>
+            <span class="fractal-game__score-value" data-score-text>0.0%</span>
+          </div>
+          <div class="fractal-game__bar" role="progressbar" aria-label="Match score" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="fractal-game__bar-fill" data-score-fill></div>
+          </div>
+          <div class="fractal-game__score-note" data-status-text></div>
+        </div>
+      </div>
+
+      <div class="fractal-game__controls">
+        <div class="fractal-game__button-row">
+          <button type="button" class="fractal-game__button fractal-game__button--hint" data-hint-btn>Hint</button>
+          <button type="button" class="fractal-game__button fractal-game__button--reset" data-reset-btn>Reset c</button>
+          <button type="button" class="fractal-game__button fractal-game__button--next" data-next-btn disabled>Next level</button>
+        </div>
+        <div class="fractal-game__complete" data-complete-text></div>
+      </div>
+
+      <div class="fractal-game__hint" data-hint-text></div>
+    </div>
+
+    <div class="fractal-game__grid">
+      <article class="fractal-game__panel">
+        <h3>Target Pattern</h3>
+        <p>Match your Julia set to this pattern.</p>
+        <div class="fractal-game__canvas-wrap">
+          <canvas data-target-canvas width="240" height="240"></canvas>
+        </div>
+      </article>
+
+      <article class="fractal-game__panel">
+        <h3>Your Julia Set</h3>
+        <p>This is the Julia set you are producing! <em>c</em>.</p>
+        <div class="fractal-game__canvas-wrap">
+          <canvas data-julia-canvas width="240" height="240"></canvas>
+        </div>
+      </article>
+
+      <article class="fractal-game__panel">
+        <h3>Complex Plane</h3>
+        <p>Drag the point to choose the parameter for the Julia set.</p>
+        <div class="fractal-game__canvas-wrap fractal-game__canvas-wrap--wide">
+          <canvas data-plane-canvas width="320" height="240"></canvas>
+          <div class="fractal-game__marker fractal-game__marker--current" data-current-marker></div>
+          <div class="fractal-game__marker fractal-game__marker--target" data-target-marker></div>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const root = document.currentScript.closest("[data-fractal-game]");
+      if (!root) {
+        return;
+      }
+
+      const RES = 240;
+      const MAX_ITER = 100;
+      const EXTENT = 2.0;
+      const CXMIN = -2.2;
+      const CXMAX = 0.8;
+      const CYMIN = -1.5;
+      const CYMAX = 1.5;
+      const MOBILE_MAX_WIDTH = 1024;
+      const START_C = { re: -0.5, im: 0.0 };
+
+      const TARGETS = [
+        {
+          name: "Basilica",
+          emoji: "🏛️",
+          c: { re: -1.0, im: 0.0 },
+          difficulty: "Easy",
+          hint: "Perfectly symmetric about the real axis. Try Im(c) = 0 and sweep Re(c) toward −1.",
+          threshold: 80,
+        },
+        {
+          name: "Dendrite",
+          emoji: "🌿",
+          c: { re: 0.0, im: 1.0 },
+          difficulty: "Easy",
+          hint: "A branching tree with no filled interior. It sits on the imaginary axis: Re(c) = 0, Im(c) = 1.",
+          threshold: 80,
+        },
+        {
+          name: "Douady Rabbit",
+          emoji: "🐰",
+          c: { re: -0.1226, im: 0.7449 },
+          difficulty: "Medium",
+          hint: "Three lobes arranged like rabbit ears. Look in the upper half-plane near Re(c) ≈ −0.12.",
+          threshold: 75,
+        },
+      ];
+
+      const juliaCanvas = root.querySelector("[data-julia-canvas]");
+      const targetCanvas = root.querySelector("[data-target-canvas]");
+      const planeCanvas = root.querySelector("[data-plane-canvas]");
+      const currentMarker = root.querySelector("[data-current-marker]");
+      const targetMarker = root.querySelector("[data-target-marker]");
+
+      const levelName = root.querySelector("[data-level-name]");
+      const levelDifficulty = root.querySelector("[data-level-difficulty]");
+      const scoreText = root.querySelector("[data-score-text]");
+      const scoreFill = root.querySelector("[data-score-fill]");
+      const scoreBar = root.querySelector('[role="progressbar"]');
+      const statusText = root.querySelector("[data-status-text]");
+      const hintText = root.querySelector("[data-hint-text]");
+      const completeText = root.querySelector("[data-complete-text]");
+      const hintBtn = root.querySelector("[data-hint-btn]");
+      const resetBtn = root.querySelector("[data-reset-btn]");
+      const nextBtn = root.querySelector("[data-next-btn]");
+
+      const ctxJulia = juliaCanvas.getContext("2d", { alpha: false });
+      const ctxTarget = targetCanvas.getContext("2d", { alpha: false });
+      const ctxPlane = planeCanvas.getContext("2d", { alpha: false });
+
+      const juliaPalette = [
+        [7, 10, 18],
+        [17, 48, 82],
+        [0, 133, 161],
+        [18, 204, 190],
+        [178, 245, 234],
+      ];
+
+      const targetPalette = [
+        [3, 4, 17],
+        [32, 12, 72],
+        [84, 15, 109],
+        [187, 55, 84],
+        [249, 142, 8],
+        [252, 255, 164],
+      ];
+
+      const mandelbrotPalette = [
+        [4, 6, 12],
+        [27, 29, 40],
+        [54, 41, 79],
+        [99, 58, 133],
+        [170, 88, 168],
+        [242, 170, 113],
+      ];
+
+      let currentC = { ...START_C };
+      let currentLevel = 0;
+      let currentTarget = null;
+      let currentTargetData = null;
+      let currentJuliaData = null;
+      let currentTargetShown = false;
+      let isDragging = false;
+      let rafId = 0;
+      let renderToken = 0;
+
+      function setMobileState() {
+        const isMobile = window.matchMedia(`(max-width: ${MOBILE_MAX_WIDTH}px)`).matches;
+        root.classList.toggle("is-mobile", isMobile);
+      }
+
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+      }
+
+      function complex(re, im) {
+        return { re, im };
+      }
+
+      function meanAndStd(values) {
+        const len = values.length;
+        let sum = 0;
+        for (let i = 0; i < len; i += 1) {
+          sum += values[i];
+        }
+        const mean = sum / len;
+        let variance = 0;
+        for (let i = 0; i < len; i += 1) {
+          const centered = values[i] - mean;
+          variance += centered * centered;
+        }
+        return { mean, std: Math.sqrt(variance / len) };
+      }
+
+      function similarityScore(current, target) {
+        const { mean: meanCurrent, std: stdCurrent } = meanAndStd(current);
+        const { mean: meanTarget, std: stdTarget } = meanAndStd(target);
+        if (stdCurrent < 1e-7 || stdTarget < 1e-7) {
+          return 0;
+        }
+
+        let covariance = 0;
+        for (let i = 0; i < current.length; i += 1) {
+          covariance += (current[i] - meanCurrent) * (target[i] - meanTarget);
+        }
+
+        return clamp((covariance / current.length) / (stdCurrent * stdTarget) * 100, 0, 100);
+      }
+
+      function computeJulia(c, resolution = RES, maxIter = MAX_ITER, extent = EXTENT) {
+        const data = new Float32Array(resolution * resolution);
+        const step = (extent * 2) / (resolution - 1);
+        let index = 0;
+
+        for (let row = 0; row < resolution; row += 1) {
+          const y = -extent + row * step;
+          for (let col = 0; col < resolution; col += 1) {
+            const x = -extent + col * step;
+            let zr = x;
+            let zi = y;
+            let iteration = 0;
+
+            while (iteration < maxIter) {
+              const zr2 = zr * zr - zi * zi + c.re;
+              const zi2 = 2 * zr * zi + c.im;
+              zr = zr2;
+              zi = zi2;
+              if (zr * zr + zi * zi > 4) {
+                const magnitude = Math.sqrt(zr * zr + zi * zi);
+                const logValue = Math.log2(Math.log2(Math.max(magnitude, 1 + 1e-9)));
+                data[index] = Math.max(0, iteration + 1 - logValue);
+                break;
+              }
+              iteration += 1;
+            }
+
+            index += 1;
+          }
+        }
+
+        return data;
+      }
+
+      function computeMandelbrot(width = 320, height = 240, maxIter = 120, xmin = CXMIN, xmax = CXMAX, ymin = CYMIN, ymax = CYMAX) {
+        const data = new Float32Array(width * height);
+        const xStep = (xmax - xmin) / (width - 1);
+        const yStep = (ymax - ymin) / (height - 1);
+        let index = 0;
+
+        for (let row = 0; row < height; row += 1) {
+          const cy = ymin + row * yStep;
+          for (let col = 0; col < width; col += 1) {
+            const cx = xmin + col * xStep;
+            let zr = 0;
+            let zi = 0;
+            let iteration = 0;
+
+            while (iteration < maxIter) {
+              const zr2 = zr * zr - zi * zi + cx;
+              const zi2 = 2 * zr * zi + cy;
+              zr = zr2;
+              zi = zi2;
+              if (zr * zr + zi * zi > 4) {
+                data[index] = (iteration + 1) / maxIter;
+                break;
+              }
+              iteration += 1;
+            }
+
+            index += 1;
+          }
+        }
+
+        return data;
+      }
+
+      function mixChannel(a, b, t) {
+        return Math.round(a + (b - a) * t);
+      }
+
+      function samplePalette(t, palette) {
+        const clamped = clamp(t, 0, 1);
+        const scaled = clamped * (palette.length - 1);
+        const leftIndex = Math.floor(scaled);
+        const rightIndex = Math.min(palette.length - 1, leftIndex + 1);
+        const localT = scaled - leftIndex;
+        const left = palette[leftIndex];
+        const right = palette[rightIndex];
+        return [
+          mixChannel(left[0], right[0], localT),
+          mixChannel(left[1], right[1], localT),
+          mixChannel(left[2], right[2], localT),
+        ];
+      }
+
+      function percentile(values, p) {
+        const copy = Array.from(values);
+        copy.sort((a, b) => a - b);
+        const index = Math.floor((copy.length - 1) * p);
+        return copy[index];
+      }
+
+      function paintFractal(canvas, ctx, data, width, height, palette, maxValue = MAX_ITER, alpha = 255) {
+        canvas.width = width;
+        canvas.height = height;
+        const image = ctx.createImageData(width, height);
+        const pixels = image.data;
+
+        const adaptiveMax = Math.max(1e-6, Math.min(maxValue, percentile(data, 0.995)));
+        for (let i = 0, p = 0; i < data.length; i += 1, p += 4) {
+          const value = clamp(data[i] / adaptiveMax, 0, 1);
+          const [r, g, b] = samplePalette(value, palette);
+          pixels[p] = r;
+          pixels[p + 1] = g;
+          pixels[p + 2] = b;
+          pixels[p + 3] = alpha;
+        }
+
+        ctx.putImageData(image, 0, 0);
+      }
+
+      function paintPlaneBackground() {
+        const width = 320;
+        const height = 240;
+        const data = computeMandelbrot(width, height, 120);
+        paintFractal(planeCanvas, ctxPlane, data, width, height, mandelbrotPalette, 1, 255);
+
+        const zeroX = ((0 - CXMIN) / (CXMAX - CXMIN)) * width;
+        const zeroY = (1 - (0 - CYMIN) / (CYMAX - CYMIN)) * height;
+
+        ctxPlane.save();
+        ctxPlane.strokeStyle = "rgba(255, 255, 255, 0.15)";
+        ctxPlane.lineWidth = 1;
+        ctxPlane.beginPath();
+        ctxPlane.moveTo(0, zeroY);
+        ctxPlane.lineTo(width, zeroY);
+        ctxPlane.moveTo(zeroX, 0);
+        ctxPlane.lineTo(zeroX, height);
+        ctxPlane.stroke();
+        ctxPlane.restore();
+      }
+
+      function updateCurrentMarker(c) {
+        const x = ((c.re - CXMIN) / (CXMAX - CXMIN)) * 100;
+        const y = (1 - (c.im - CYMIN) / (CYMAX - CYMIN)) * 100;
+        currentMarker.style.left = `${clamp(x, 0, 100)}%`;
+        currentMarker.style.top = `${clamp(y, 0, 100)}%`;
+      }
+
+      function updateTargetMarker(target, visible) {
+        const x = ((target.c.re - CXMIN) / (CXMAX - CXMIN)) * 100;
+        const y = (1 - (target.c.im - CYMIN) / (CYMAX - CYMIN)) * 100;
+        targetMarker.style.left = `${clamp(x, 0, 100)}%`;
+        targetMarker.style.top = `${clamp(y, 0, 100)}%`;
+        targetMarker.classList.toggle("is-visible", Boolean(visible));
+      }
+
+      function updateLevelMeta() {
+        const level = currentTarget;
+        const label = `Level ${currentLevel + 1} / ${TARGETS.length}`;
+        levelName.textContent = `${label}  ${level.emoji} ${level.name}`;
+        levelDifficulty.textContent = `[${level.difficulty}]`;
+      }
+
+      function updateScore(score) {
+        scoreText.textContent = `${score.toFixed(1)}%`;
+        scoreFill.style.width = `${score}%`;
+        scoreBar.setAttribute("aria-valuenow", `${score.toFixed(1)}`);
+
+        let message = "";
+        if (score >= currentTarget.threshold) {
+          message = 'Pattern matched. Press "Next level" to continue.';
+          statusText.style.color = "var(--green)";
+          nextBtn.disabled = false;
+        } else if (score >= 60) {
+          message = "Getting warmer. Keep tuning the parameter.";
+          statusText.style.color = "var(--amber)";
+          nextBtn.disabled = true;
+        } else if (score >= 35) {
+          message = "You are on the right track.";
+          statusText.style.color = "#ffb27a";
+          nextBtn.disabled = true;
+        } else {
+          message = "";
+          statusText.style.color = "var(--muted)";
+          nextBtn.disabled = true;
+        }
+
+        statusText.textContent = message;
+      }
+
+      function scheduleRender() {
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+        }
+        rafId = requestAnimationFrame(() => {
+          rafId = 0;
+          renderCurrentJulia();
+        });
+      }
+
+      function setC(nextC) {
+        currentC = {
+          re: clamp(nextC.re, CXMIN, CXMAX),
+          im: clamp(nextC.im, CYMIN, CYMAX),
+        };
+        updateCurrentMarker(currentC);
+        scheduleRender();
+      }
+
+      function renderCurrentJulia() {
+        const token = ++renderToken;
+        const data = computeJulia(currentC);
+        if (token !== renderToken) {
+          return;
+        }
+        currentJuliaData = data;
+        paintFractal(juliaCanvas, ctxJulia, data, 240, 240, juliaPalette, MAX_ITER, 255);
+        const score = similarityScore(currentJuliaData, currentTargetData);
+        updateScore(score);
+      }
+
+      function loadLevel(levelIndex) {
+        if (levelIndex >= TARGETS.length) {
+          levelName.textContent = "All levels cleared";
+          levelDifficulty.textContent = "You are a Fractal Master.";
+          scoreText.textContent = "100.0%";
+          scoreFill.style.width = "100%";
+          scoreBar.setAttribute("aria-valuenow", "100");
+          statusText.textContent = "";
+          hintText.textContent = "";
+          completeText.textContent = "All levels cleared — you are a Fractal Master.";
+          nextBtn.disabled = true;
+          nextBtn.textContent = "Complete";
+          hintBtn.disabled = true;
+          resetBtn.disabled = true;
+          return;
+        }
+
+        currentLevel = levelIndex;
+        currentTarget = TARGETS[levelIndex];
+        currentTargetData = computeJulia(currentTarget.c);
+        currentTargetShown = false;
+
+        hintText.textContent = "";
+        completeText.textContent = "";
+        nextBtn.disabled = true;
+        nextBtn.textContent = levelIndex === TARGETS.length - 1 ? "Final level" : "Next level";
+        hintBtn.disabled = false;
+        resetBtn.disabled = false;
+
+        updateLevelMeta();
+        updateTargetMarker(currentTarget, false);
+        paintFractal(targetCanvas, ctxTarget, currentTargetData, 240, 240, targetPalette, MAX_ITER, 255);
+        setC(START_C);
+      }
+
+      function showHint() {
+        const target = currentTarget;
+        hintText.textContent = `Hint: ${target.hint}`;
+        if (!currentTargetShown) {
+          currentTargetShown = true;
+          updateTargetMarker(target, true);
+        }
+      }
+
+      function resetCurrent() {
+        setC(START_C);
+      }
+
+      function advanceLevel() {
+        if (nextBtn.disabled) {
+          return;
+        }
+        loadLevel(currentLevel + 1);
+      }
+
+      function pointerToComplex(event) {
+        const rect = planeCanvas.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width;
+        const y = (event.clientY - rect.top) / rect.height;
+        return complex(
+          CXMIN + x * (CXMAX - CXMIN),
+          CYMAX - y * (CYMAX - CYMIN),
+        );
+      }
+
+      planeCanvas.addEventListener("pointerdown", (event) => {
+        planeCanvas.setPointerCapture(event.pointerId);
+        isDragging = true;
+        setC(pointerToComplex(event));
+      });
+
+      planeCanvas.addEventListener("pointermove", (event) => {
+        if (!isDragging) {
+          return;
+        }
+        setC(pointerToComplex(event));
+      });
+
+      planeCanvas.addEventListener("pointerup", () => {
+        isDragging = false;
+      });
+
+      planeCanvas.addEventListener("pointercancel", () => {
+        isDragging = false;
+      });
+
+      planeCanvas.addEventListener("pointerleave", () => {
+        isDragging = false;
+      });
+
+      hintBtn.addEventListener("click", showHint);
+      resetBtn.addEventListener("click", resetCurrent);
+      nextBtn.addEventListener("click", advanceLevel);
+
+      setMobileState();
+      window.addEventListener("resize", setMobileState);
+      paintPlaneBackground();
+      loadLevel(0);
+    })();
+  </script>
+</section>
