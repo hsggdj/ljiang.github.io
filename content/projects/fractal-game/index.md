@@ -39,7 +39,7 @@ As players navigate through levels to match the target pattern, the game encoura
 
 Fractal Pattern Hunter was presented at the Mathematics for Biology booth during the [Dresden Long Night of Science](https://www.wissenschaftsnacht-dresden.de/) on June 26, 2026. Thanks to everyone that had a go at it! 
 
-![Fractal pattern example](fractal1.jpg)
+![Presenting the fractal game](fractal1.jpg)
 
 
 ## How It Works
@@ -59,3 +59,5 @@ If a point's value shoots off to infinity, it gets colored based on how fast it 
 ### The Mandelbrot Set
 
 The map on the right where you drag the cyan dot is the Mandelbrot set. It acts as a control panel for all possible Julia sets. Choosing a $c$ inside the Mandelbrot set creates a single, connected Julia set. Choosing a $c$ outside causes the Julia set to shatter into infinitely many tiny, disconnected pieces (often called "fractal dust").
+
+![Julia set comics](fractal2.JPG)
